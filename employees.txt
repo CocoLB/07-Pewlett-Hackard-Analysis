@@ -6,7 +6,7 @@ dept_name varchar
 Dept_Emp
 -
 emp_no pk fk -< Employees.emp_no 
-dept_no fk -< Departments.dept_no
+dept_no pk fk -< Departments.dept_no
 from_date
 to_date
 
