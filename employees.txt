@@ -36,6 +36,6 @@ to_date date
 Titles
 -
 emp_no pk fk -< Employees.emp_no
-title varchar pk
-from_date date pk
+title varchar 
+from_date date 
 to_date date
