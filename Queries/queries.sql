@@ -66,7 +66,7 @@ FROM departments as d
 INNER JOIN dept_manager as dm
 ON d.dept_no = dm.dept_no;
 
--- Joining retirement_fino and dept_emp
+-- Joining retirement_info and dept_emp - retirees currently employed
 SELECT ri.emp_no,
 	ri.first_name,
 	ri.last_name,
@@ -154,6 +154,8 @@ WHERE d.dept_name IN ('Sales', 'Development');
 
 ------CHALLENGE-------
 
+--Table 1: Number of Retiring Employees by Title
+
 --table for retiring employees by title and salaries, joining emp_info and titles
 SELECT ei.emp_no, ei.first_name, ei.last_name, t.title, t.from_date, ei.salary
 into retirement_by_title
@@ -161,7 +163,70 @@ FROM emp_info ei
 JOIN titles t ON (ei.emp_no = t.emp_no AND ei.to_date = t.to_date)
 ORDER BY ei.emp_no;
 
+-- trying other method giving table with duplicates then partitioning it
+SELECT ei.emp_no, ei.first_name, ei.last_name, t.title, t.from_date, ei.salary
+into retirement_title_dup
+FROM emp_info ei
+JOIN titles t ON ei.emp_no = t.emp_no 
+ORDER BY ei.emp_no;	  
 
+select * from retirement_title_dup
+
+-- using partition, keep only the most recent title for each employee in retirement_title_dup
+SELECT tmp.emp_no, tmp.first_name, tmp.last_name, tmp.title, tmp.from_date, tmp.salary
+INTO retirement_title_part
+FROM
+ (SELECT rtd.emp_no, rtd.first_name, rtd.last_name, rtd.title, 
+  rtd.from_date, rtd.salary, ROW_NUMBER() OVER
+ (PARTITION BY (emp_no)
+ ORDER BY from_date DESC) rn
+ FROM retirement_title_dup rtd
+ ) tmp WHERE rn = 1
+ORDER BY emp_no;
+
+-- CHECKING THAT BOTH METHODS GIVE SAME RESULTS
+SELECT * FROM retirement_by_title
+EXCEPT
+SELECT * FROM retirement_title_part;
+
+
+-- Table 2: Mentorship Eligibility
+--1 join and no duplicate
+SELECT e.emp_no, e.first_name, e.last_name, t.title, t.from_date, t.to_date
+FROM employees e
+INTO mentorship_eligibility
+JOIN titles t
+ON e.emp_no = t.emp_no
+WHERE (e.birth_date BETWEEN '1965-01-01' AND '1965-12-31')
+	AND t.to_date = ('9999-01-01')
+
+-- 2 joins and duplicates
+SELECT e.emp_no, e.first_name, e.last_name, t.title, de.from_date, de.to_date
+INTO mentorship_dup
+FROM employees e
+JOIN titles t
+ON e.emp_no = t.emp_no
+JOIN dept_emp as de
+ON t.emp_no = de.emp_no
+WHERE (e.birth_date BETWEEN '1965-01-01' AND '1965-12-31')
+	AND t.to_date = ('9999-01-01')
+	
+-- using partition
+SELECT tmp.emp_no, tmp.first_name, tmp.last_name, tmp.title, tmp.from_date, tmp.to_date
+INTO mentorship_part
+FROM
+ (SELECT md.emp_no, md.first_name, md.last_name, md.title, 
+  md.from_date, md.to_date, ROW_NUMBER() OVER
+ (PARTITION BY (emp_no)
+ ORDER BY from_date DESC) rn
+ FROM mentorship_dup md
+ ) tmp WHERE rn = 1
+ORDER BY emp_no;
+
+-- CHECKING THAT BOTH METHODS GIVE SAME RESULTS
+SELECT me.emp_no FROM mentorship_eligibility me
+EXCEPT
+SELECT mp.emp_no FROM mentorship_part mp;
 
 
 
