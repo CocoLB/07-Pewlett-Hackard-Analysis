@@ -68,7 +68,7 @@ We checked that both tables gave the same result.
             EXCEPT
             SELECT * FROM retirement_title_part;
 
-The info is all in the file reirement_by_title.csv, where we see that 33,118 employees will retire. As they are all ordered by title, we can easily group them by title and give the number of employees per each title with this query:
+The info is all in the file retirement_by_title.csv, where we see that 33,118 employees will retire. As they are all ordered by title, we can easily group them by title and give the number of employees per each title with this query:
 
           SELECT title, COUNT(1)
           FROM retirement_by_title
@@ -109,9 +109,11 @@ We checked that both tables give us the same result.
           EXCEPT
           SELECT ml.emp_no FROM mentorship_el_2 ml;
           
+The info is in the file mentorshipo.csv
+
 There are 1,549 employees who could be eligible to enter the mentorship program.
 
-**Doing a similar query group by title as for Table 1, we see that there are 29 Assistant Engineers, 569 Senior Staff, 77 Technique Leaders, 190 Engineers, and 529 Senior Engineers.**
+Doing a similar query group by title as we did for Table 1, **we see that there are 29 Assistant Engineers, 569 Senior Staff, 77 Technique Leaders, 190 Engineers, and 529 Senior Engineers.**
 
 To differentiate them and see who would have most experience, we can have 3 from_date dates in this table, the date when they were hired (in the table Employees), and the date when they entered their current Department (in the table Dept_emp), and the date when they started their current title.
 
