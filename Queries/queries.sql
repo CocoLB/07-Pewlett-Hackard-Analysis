@@ -156,19 +156,19 @@ WHERE d.dept_name IN ('Sales', 'Development');
 
 --Table 1: Number of Retiring Employees by Title
 
---table for retiring employees by title and salaries, joining emp_info and titles
+--table for retiring employees by title and salaries, joining emp_info and titles, ordering by title first
 SELECT ei.emp_no, ei.first_name, ei.last_name, t.title, t.from_date, ei.salary
 into retirement_by_title
 FROM emp_info ei
 JOIN titles t ON (ei.emp_no = t.emp_no AND ei.to_date = t.to_date)
-ORDER BY ei.emp_no;
+ORDER BY t.title, ei.emp_no
 
 -- trying other method giving table with duplicates then partitioning it
 SELECT ei.emp_no, ei.first_name, ei.last_name, t.title, t.from_date, ei.salary
 into retirement_title_dup
 FROM emp_info ei
 JOIN titles t ON ei.emp_no = t.emp_no 
-ORDER BY ei.emp_no;	  
+ORDER BY t.title, ei.emp_no  
 
 select * from retirement_title_dup
 
@@ -190,8 +190,15 @@ EXCEPT
 SELECT * FROM retirement_title_part;
 
 
+--counting the number of retirees by title
+SELECT title, COUNT(1)
+FROM retirement_by_title
+GROUP BY title;
+
+
+
 -- Table 2: Mentorship Eligibility
---1 join and no duplicate
+--1 join
 SELECT e.emp_no, e.first_name, e.last_name, t.title, t.from_date, t.to_date
 FROM employees e
 INTO mentorship_eligibility
@@ -200,9 +207,9 @@ ON e.emp_no = t.emp_no
 WHERE (e.birth_date BETWEEN '1965-01-01' AND '1965-12-31')
 	AND t.to_date = ('9999-01-01')
 
--- 2 joins and duplicates
+-- 2 joins (with from_date being the date entering the department)
 SELECT e.emp_no, e.first_name, e.last_name, t.title, de.from_date, de.to_date
-INTO mentorship_dup
+INTO mentorship_el_2
 FROM employees e
 JOIN titles t
 ON e.emp_no = t.emp_no
@@ -211,23 +218,15 @@ ON t.emp_no = de.emp_no
 WHERE (e.birth_date BETWEEN '1965-01-01' AND '1965-12-31')
 	AND t.to_date = ('9999-01-01')
 	
--- using partition
-SELECT tmp.emp_no, tmp.first_name, tmp.last_name, tmp.title, tmp.from_date, tmp.to_date
-INTO mentorship_part
-FROM
- (SELECT md.emp_no, md.first_name, md.last_name, md.title, 
-  md.from_date, md.to_date, ROW_NUMBER() OVER
- (PARTITION BY (emp_no)
- ORDER BY from_date DESC) rn
- FROM mentorship_dup md
- ) tmp WHERE rn = 1
-ORDER BY emp_no;
 
 -- CHECKING THAT BOTH METHODS GIVE SAME RESULTS
 SELECT me.emp_no FROM mentorship_eligibility me
 EXCEPT
-SELECT mp.emp_no FROM mentorship_part mp;
+SELECT ml.emp_no FROM mentorship_el_2 ml;
 
-
+-- counting how many mentors per title
+SELECT title, COUNT(1)
+FROM mentorship_eligibility
+group by title
 
 
