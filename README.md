@@ -29,7 +29,7 @@ Getting tables/files of employees ready to retire grouped by job title, and of e
 
 ## Challenge Summary
 
-- Table 1: employees ready to retire grouped by title
+- **Table 1: employees ready to retire grouped by title**
 
 Looking at the ERD, we see that the employee number, first and last name can be founnd in the table Employees, salary in the table Salaries, and title and from_date in the table Titles. But we have already created a new table, emp_info, with all the employees ready to retire, with their number, name and salary. So we only need to join it with the table Title. 
 
@@ -74,10 +74,10 @@ The info is all in the file reirement_by_title.csv, where we see that 33,118 emp
           FROM retirement_by_title
           GROUP BY title;
           
-There will be 2711 Engineers, 13651 Senior Engineers,2 Managers, 251 Assistant Engineers, 2022 Staff, 12872 Senior Staff, and 1609 Technique Leaders retiring.
+**There will be 2711 Engineers, 13651 Senior Engineers,2 Managers, 251 Assistant Engineers, 2022 Staff, 12872 Senior Staff, and 1609 Technique Leaders retiring.**
 
 
-- Table 2: employees ready to enter the mentorship program.
+- **Table 2: employees ready to enter the mentorship program**
 
 To be eligible to enter the mentorship program, employees must have been born in 1965.
 
@@ -111,7 +111,7 @@ We checked that both tables give us the same result.
           
 There are 1,549 employees who could be eligible to enter the mentorship program.
 
-Doing a similar query group by title as for Table 1, we see that there are 29 Assistant Engineers, 569 Senior Staff, 77 Technique Leaders, 190 Engineers, and 529 Senior Engineers.
+**Doing a similar query group by title as for Table 1, we see that there are 29 Assistant Engineers, 569 Senior Staff, 77 Technique Leaders, 190 Engineers, and 529 Senior Engineers.**
 
 To differentiate them and see who would have most experience, we can have 3 from_date dates in this table, the date when they were hired (in the table Employees), and the date when they entered their current Department (in the table Dept_emp), and the date when they started their current title.
 
